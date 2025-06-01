@@ -215,8 +215,8 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // URL вашего сервера с данными через LocalTunnel (обновите на ваш текущий адрес)
-        const DATA_API_URL = 'https://wise-lizards-turn.loca.lt/data';
+        // URL вашего сервера с данными через LocalTunnel (обновите на ваш ТЕКУЩИЙ адрес от LocalTunnel)
+        const DATA_API_URL = 'https://ВАШ_ТЕКУЩИЙ_АДРЕС_LOCALTUNNEL/data';
 
         // Функция для получения всех данных с вашего сервера
         async function fetchData() {
@@ -231,14 +231,15 @@
                 if (!data) {
                      throw new Error("Получены пустые данные");
                 }
-                
+
                 // Обновляем курсы валют
-                document.getElementById('usd-rub').textContent = `${data.usd_rub ? data.usd_rub.toFixed(2) + ' ₽' : 'Ошибка'}`;
-                document.getElementById('btc-usd').textContent = `${data.btc_usd ? '$' + data.btc_usd.toLocaleString() : 'Ошибка'}`;
-                
+                // Убедитесь, что имена полей в JSON ответе от вашего FastAPI сервера совпадают (usd_rub, btc_usd, news)
+                document.getElementById('usd-rub').textContent = `${data.usd_rub ? parseFloat(data.usd_rub).toFixed(2) + ' ₽' : 'Ошибка'}`;
+                document.getElementById('btc-usd').textContent = `${data.btc_usd ? '$' + parseFloat(data.btc_usd).toLocaleString() : 'Ошибка'}`;
+
                 // Обновляем новости
                 const newsContainer = document.getElementById('news-container');
-                if (data.news && data.news.length > 0) {
+                if (data.news && Array.isArray(data.news) && data.news.length > 0) {
                     newsContainer.innerHTML = data.news.map(item => `
                         <div class="news-item">
                             <a href="${item.link}" class="news-link" target="_blank">${item.title}</a>
@@ -251,7 +252,7 @@
                         </div>
                     `;
                 }
-                
+
             } catch (error) {
                 console.error('Error fetching data from backend:', error);
                 document.getElementById('news-container').innerHTML = `
@@ -268,7 +269,7 @@
         fetchData();
 
         // Обновляем данные каждые 5 минут (опционально, если backend обновляет данные)
-        setInterval(fetchData, 300000);
+        // setInterval(fetchData, 300000); // Закомментировано, так как LocalTunnel может отключиться
     </script>
 </body>
 </html>
